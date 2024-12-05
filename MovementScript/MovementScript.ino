@@ -1,6 +1,4 @@
-// Mechatronics - Lab 4
-// Tuesday 2:15 Section
-// Implements movement functions for the robot.
+// This is the final movement program for the project
 
 // IMPORTANT NOTE: Coast is used before most Forward/Reverse applications,
 // given how the previous state could possibly be in the opposite direction,
@@ -13,25 +11,27 @@
 
 // Defining PINS
 // ENA, IN1 and IN2 are the 1st (LEFT) motor variables
-// ENB, IN2 and IN2 are the 2nd (RIGHT) motor variables
-#define ENA 6
-#define ENB 7
-#define IN1 8
-#define IN2 9
-#define IN3 10
-#define IN4 11
+// ENB, IN3 and IN4 are the 2nd (RIGHT) motor variables
+#define ENA 26
+#define ENB 36
+#define IN1 28
+#define IN2 30
+#define IN3 32
+#define IN4 34
 
 // Digital INPUT pins for measuring distance
-#define LOutA 3 
-#define LOutB 5
-#define ROutA 2
-#define ROutB 4
+#define LOutA 22
+#define LOutB 23
+#define ROutA 24
+#define ROutB 25
 
 // Input PINS for DIP switches
+/*
 #define speed1 50
 #define speed2 51
 #define speed3 52
 #define speed4 53
+*/
 
 // Global variables
 char buffer[10];
@@ -69,14 +69,16 @@ void setup() {
   pinMode(ROutA, INPUT_PULLUP);
   pinMode(ROutB, INPUT_PULLUP);
 
+  /*
   pinMode(speed1, INPUT);
   pinMode(speed2, INPUT);
   pinMode(speed3, INPUT);
   pinMode(speed4, INPUT);
+  */
 
   // Attaching interrupts to ONLY ONE wheel output
   // Part 2 section
-  attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
+  attachInterrupt(digitalPinToInterrupt(1LOutA), interruptRising, RISING);
   attachInterrupt(digitalPinToInterrupt(LOutA), interruptFalling, FALLING);
 
   // Set everything else to LOW for now (aka COAST)
