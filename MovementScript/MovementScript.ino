@@ -78,7 +78,7 @@ void setup() {
 
   // Attaching interrupts to ONLY ONE wheel output
   // Part 2 section
-  attachInterrupt(digitalPinToInterrupt(1LOutA), interruptRising, RISING);
+  attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
   attachInterrupt(digitalPinToInterrupt(LOutA), interruptFalling, FALLING);
 
   // Set everything else to LOW for now (aka COAST)

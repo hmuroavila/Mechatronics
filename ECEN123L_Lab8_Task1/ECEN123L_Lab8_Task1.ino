@@ -1,13 +1,13 @@
 #include <QTRSensors.h>
 
-#define LED1 40
-#define LED2 42
-#define LED3 44
-#define LED4 46
-#define LED5 48
-#define LED6 50
-#define LED7 52
-#define LED8 54
+#define LED1 3
+#define LED2 4
+#define LED3 5
+#define LED4 6
+#define LED5 7
+#define LED6 8
+#define LED7 9
+#define LED8 10
 
 
 int userInput = 0;
