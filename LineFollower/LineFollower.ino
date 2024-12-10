@@ -3,21 +3,23 @@
 #include <string.h>
 #include <stdio.h>
 
+
+int LeftSpeed;
+int RightSpeed;
+
 // Define your sensor object
 QTRSensors qtr;
 const uint8_t sensorCount = 8;
 uint16_t sensorValues[sensorCount];
 
 // PID constants
-float Kp = 0.5; // Proportional gain
-float Ki = 0.1; // Integral gain
-float Kd = 0.2; // Derivative gain
+float Kp = 0.1; // Proportional gain
+float Ki = 0.0; // Integral gain
+float Kd = 0.0; // Derivative gain
 
 // PID variables apparently
 float error = 0, lastError = 0, integral = 0;
-
-// Desired position (middle vaue of 8 sensors)
-float middlePoint = 3500; 
+float setPoint = 3500; // Desired position (middle value for 8 sensors)
 
 // Setup your pins and sensor
 void setup() {
@@ -35,43 +37,36 @@ void setup() {
   pinMode(LED_BUILTIN,   OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
 
-  for (uint16_t i = 0; i  < 200; i++)
-  {
+  // Calibrate the sensors
+  for (int i = 0; i < 200; i++) {
     qtr.calibrate();
   }
 
   digitalWrite(LED_BUILTIN, LOW);
+
 }
 
 // Main loop
 void loop() {
-  // Read the sensor values and estimate the line position
   uint16_t position = qtr.readLineBlack(sensorValues);
-
-  // Calculate the error
+  int baseSpeed = 100;
   error = setPoint - position;
-
-  // Accumulate the integral term
   integral += error;
-
-  // Calculate the derivative term
   float derivative = error - lastError;
 
   // Compute PID output
   float output = Kp * error + Ki * integral + Kd * derivative;
 
-  // Logic to rotate or stop based on the PID output
-  if (abs(error) > 100) { // Threshold for turning
-    if (error > 0) {
-      LeftSpeed = output;
-    } 
-    else {
-      rotateRight(output);
-    }
-  }
+  LeftSpeed = constrain(baseSpeed + output, 0, 255);
+  RightSpeed = constrain(baseSpeed - output, 0, 255);
 
+  Serial.print("Error is: ");
+  Serial.println(error);
+  Serial.print("Output is: ");
+  Serial.println(output);
+  
   // Update last error
   lastError = error;
-
-  delay(10); // Small delay for stability
+  LineForward();
+  delay(10);
 }

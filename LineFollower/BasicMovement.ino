@@ -1,27 +1,24 @@
-// Movement functions
-
 // Defining PINS
 // ENA, IN1 and IN2 are the 1st (LEFT) motor variables
 // ENB, IN3 and IN4 are the 2nd (RIGHT) motor variables
 #define ENA 31
 #define ENB 33
-#define IN1 23
+#define IN1 2
 #define IN2 25
 #define IN3 27
-#define IN4 29
+#define IN4 3
 
 // Digital INPUT pins for measuring distance
 #define LOutA 22
 #define LOutB 24
-#define ROutA 26  
+#define ROutA 26
 #define ROutB 28
 
-#define LeftSpeed
-#define RightSpeed
+// New speed values for Line following in other folder
 
-void MovementSetup(){
-  // ENA, IN1 and IN2 are going to be LEFT 1 Motor
-  // ENB, IN3 and IN4 are going to be RIGHT 2 Motor
+void MovementSetup() {
+  // INitialize all pins
+  // Motor H-Bridge Output
   pinMode(ENA, OUTPUT);
   pinMode(ENB, OUTPUT);
   pinMode(IN1, OUTPUT);
@@ -37,34 +34,32 @@ void MovementSetup(){
 
   // Set everything else to LOW for now (aka COAST)
   Coast(); 
-  
 }
-
 
 
 // Subfunctions for the sake of making later code simpler
 void Left1Forward()
 {
   digitalWrite(ENA, HIGH);
-  digitalWrite(IN1, LeftSpeed);
+  digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
 }
 void Right2Forward()
 {
   digitalWrite(ENB, HIGH);
   digitalWrite(IN3, LOW);
-  digitalWrite(IN4, RightSpeed);
+  digitalWrite(IN4, HIGH);
 }
 void Left1Reverse()
 {
   digitalWrite(ENA, HIGH);
   digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LeftSpeed);
+  digitalWrite(IN2, HIGH);
 }
 void Right2Reverse()
 {
   digitalWrite(ENB, HIGH);
-  digitalWrite(IN3, RightSpeed);
+  digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
 }
 void Left1Brake()
@@ -103,6 +98,19 @@ void Forward()
   Left1Forward();
   // Right2 Motor FORWARD
   Right2Forward();
+}
+
+// Line Foward for things
+void LineForward(){
+    // Left 1 Motor things
+    digitalWrite(ENA, HIGH);
+    digitalWrite(IN1, LeftSpeed);
+    digitalWrite(IN2, LOW);
+
+    // Right 2 Motor things
+    digitalWrite(ENB, HIGH);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, RightSpeed);
 }
 
 // Opposite of Foward()
@@ -166,6 +174,7 @@ void PivotLeft()
   Right2Forward();
 }
 
+
 /*
 void cmForward(int x)
 {
@@ -188,9 +197,8 @@ void cmReverse(int x)
   interrupts();
   Reverse();
 }
+
 */
-
-
 /*
 // Interrupt services (Part 2)
 void interruptRising()
@@ -220,8 +228,8 @@ void interruptFalling()
   }
 
 }
-*/
 
+*/
 
 
 

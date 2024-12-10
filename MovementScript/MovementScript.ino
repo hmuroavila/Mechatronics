@@ -4,11 +4,11 @@
 // given how the previous state could possibly be in the opposite direction,
 // allowing the motor some time to reset before reversing polarity.
 
-/*
+
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
-*/
+
 
 
 // Defining PINS
@@ -16,15 +16,15 @@
 // ENB, IN3 and IN4 are the 2nd (RIGHT) motor variables
 #define ENA 31
 #define ENB 33
-#define IN1 23
+#define IN1 2
 #define IN2 25
 #define IN3 27
-#define IN4 29
+#define IN4 3
 
 // Digital INPUT pins for measuring distance
 #define LOutA 22
 #define LOutB 24
-#define ROutA 26  
+#define ROutA 26
 #define ROutB 28
 
 // Input PINS for DIP switches
@@ -41,9 +41,8 @@ char buffer[10];
 volatile int counter;
 int countToTravel;
 volatile bool countCheck;
+int speed;
 
-
-/*
 void setup() {
   // Stop interrupts to briefly set up some variables
   // Part 2 portion
@@ -76,24 +75,18 @@ void setup() {
   pinMode(ROutB, INPUT_PULLUP);
 
   
-  pinMode(speed1, INPUT);
-  pinMode(speed2, INPUT);
-  pinMode(speed3, INPUT);
-  pinMode(speed4, INPUT);
   
 
   // Attaching interrupts to ONLY ONE wheel output
   // Part 2 section
-  
+
+  speed = 100;
   attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
-  attachInterrupt(digitalPinToInterrupt(LOutA), interruptFalling, FALLING);
-  
+  Forward();
 
   // Set everything else to LOW for now (aka COAST)
-  Coast(); 
-  
 }
-*/
+
 
 
 
@@ -101,14 +94,14 @@ void setup() {
 void Left1Forward()
 {
   digitalWrite(ENA, HIGH);
-  digitalWrite(IN1, HIGH);
+  digitalWrite(IN1, speed);
   digitalWrite(IN2, LOW);
 }
 void Right2Forward()
 {
   digitalWrite(ENB, HIGH);
   digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  digitalWrite(IN4, speed);
 }
 void Left1Reverse()
 {
@@ -244,9 +237,9 @@ void cmReverse(int x)
 }
 
 
-/*void loop() {  
+void loop() {  
   // Below is the command input
-
+  /*
   Serial.println("Input your command: ");
   if(Serial.available() > 0)
   {
@@ -308,29 +301,27 @@ void cmReverse(int x)
 
   }  
   delay(2000);
-  
-  
+  */
+
+  Serial.print("counter is at: ");
+  Serial.println(counter);
+
+
 
 }
 
 
-/*
+
 // Interrupt services (Part 2)
 void interruptRising()
 {
   // Whenever a rising edge from LEFT motor is detected on OutputA, we call this function
   // It will add to the appropriateCOUNT
   counter++;
-
-  if((countCheck == true) && (counter >= countToTravel))
-  {
-    Brake();
-    countCheck = false;
-  }
 }
 
 
-
+/*
 void interruptFalling()
 {
   counter++;
@@ -344,7 +335,6 @@ void interruptFalling()
 
 }
 */
-
 
 
 
