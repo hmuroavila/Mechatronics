@@ -75,4 +75,11 @@ void readColor() {
   redValueAvg = (redReadings[0] + redReadings[1] + redReadings[2] + redReadings[3] + redReadings[4])/5;
   greenValueAvg = (greenReadings[0] + greenReadings[1] + greenReadings[2] + greenReadings[3] + greenReadings[4])/5;
   blueValueAvg = (blueReadings[0] + blueReadings[1] + blueReadings[2] + blueReadings[3] + blueReadings[4])/5;
+
+  Serial.print("Red avg val =");
+  Serial.println(redValueAvg);
+  Serial.print("Green avg val =");
+  Serial.println(greenValueAvg);
+  Serial.print("Blue avg val =");
+  Serial.println(blueValueAvg);
 }

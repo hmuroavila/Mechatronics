@@ -61,6 +61,7 @@ void setup() {
 
 void loop() {
   readButton();
+  readColor();
 
   while (readButton()) {
     Forward();
