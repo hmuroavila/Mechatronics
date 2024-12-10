@@ -2,7 +2,10 @@
 
 
 #include <Servo.h>
-#define distSnsr A0
+#include "Wire.h"
+#include "Adafruit_TCS34725.h"
+
+#define distSnsr A8
 #define servoPin 12 // change pin number as needed
 
 #define initalServoPosition 180 // can change inital servo position between 0 and 180 (center at 90)
@@ -21,7 +24,7 @@
 #define ServoUp 60
 
 
-
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 Servo myServo;
 
 bool stage1 = false;
@@ -35,6 +38,12 @@ bool stage8 = false;
 bool foundLine = false;
 float angleToTurn = 0;
 int angles [] = {-90, -60, -30, 30, 60, 90};
+int redReadings[5] = {0,0,0,0,0};
+int greenReadings[5] = {0,0,0,0,0};
+int blueReadings[5] = {0,0,0,0,0};
+int redValAvg;
+int greenValAvg;
+int blueValAvg;
 
 
 
