@@ -63,12 +63,11 @@ void loop() {
   // Logic to rotate or stop based on the PID output
   if (abs(error) > 100) { // Threshold for turning
     if (error > 0) {
-      rotateLeft(output);
-    } else {
+      LeftSpeed = output;
+    } 
+    else {
       rotateRight(output);
     }
-  } else {
-    stopMotors();
   }
 
   // Update last error
