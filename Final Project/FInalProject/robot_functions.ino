@@ -1,8 +1,8 @@
 bool readButton() {
-  if(onButtonPin = 1) {
-    onButton = TRUE;
+  if(onButtonPin == 1) {
+    onButton = true;
   } else {
-    onButton = FALSE;
+    onButton = false;
   }
   return onButton;
 }
