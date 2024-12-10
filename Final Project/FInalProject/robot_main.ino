@@ -1,3 +1,6 @@
+// Main program for the robot, this is where the state machine should be.
+
+
 #include <Servo.h>
 
 #define distSnsr A0

@@ -1,15 +1,4 @@
-// This is the final movement program for the project
-
-// IMPORTANT NOTE: Coast is used before most Forward/Reverse applications,
-// given how the previous state could possibly be in the opposite direction,
-// allowing the motor some time to reset before reversing polarity.
-
-/*
-#include <math.h>
-#include <string.h>
-#include <stdio.h>
-*/
-
+// Movement functions
 
 // Defining PINS
 // ENA, IN1 and IN2 are the 1st (LEFT) motor variables
@@ -27,41 +16,12 @@
 #define ROutA 26  
 #define ROutB 28
 
-// Input PINS for DIP switches
-/*
-#define speed1 50
-#define speed2 51
-#define speed3 52
-#define speed4 53
-*/
+#define LeftSpeed
+#define RightSpeed
 
-// Global variables
-char buffer[10];
-
-volatile int counter;
-int countToTravel;
-volatile bool countCheck;
-
-
-/*
-void setup() {
-  // Stop interrupts to briefly set up some variables
-  // Part 2 portion
-  // Stop interupts and 
-  
-  noInterrupts();
-  counter = 0;
-  countCheck = false;
-  interrupts();
-  
-  
-  
-  Serial.begin(9600);
-  Serial.setTimeout(60000);
-
-
-  // Init all pins
-  // Motor H-Bridge Output
+void MovementSetup(){
+  // ENA, IN1 and IN2 are going to be LEFT 1 Motor
+  // ENB, IN3 and IN4 are going to be RIGHT 2 Motor
   pinMode(ENA, OUTPUT);
   pinMode(ENB, OUTPUT);
   pinMode(IN1, OUTPUT);
@@ -75,25 +35,10 @@ void setup() {
   pinMode(ROutA, INPUT_PULLUP);
   pinMode(ROutB, INPUT_PULLUP);
 
-  
-  pinMode(speed1, INPUT);
-  pinMode(speed2, INPUT);
-  pinMode(speed3, INPUT);
-  pinMode(speed4, INPUT);
-  
-
-  // Attaching interrupts to ONLY ONE wheel output
-  // Part 2 section
-  
-  attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
-  attachInterrupt(digitalPinToInterrupt(LOutA), interruptFalling, FALLING);
-  
-
   // Set everything else to LOW for now (aka COAST)
   Coast(); 
   
 }
-*/
 
 
 
@@ -101,25 +46,25 @@ void setup() {
 void Left1Forward()
 {
   digitalWrite(ENA, HIGH);
-  digitalWrite(IN1, HIGH);
+  digitalWrite(IN1, LeftSpeed);
   digitalWrite(IN2, LOW);
 }
 void Right2Forward()
 {
   digitalWrite(ENB, HIGH);
   digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  digitalWrite(IN4, RightSpeed);
 }
 void Left1Reverse()
 {
   digitalWrite(ENA, HIGH);
   digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
+  digitalWrite(IN2, LeftSpeed);
 }
 void Right2Reverse()
 {
   digitalWrite(ENB, HIGH);
-  digitalWrite(IN3, HIGH);
+  digitalWrite(IN3, RightSpeed);
   digitalWrite(IN4, LOW);
 }
 void Left1Brake()
@@ -221,6 +166,7 @@ void PivotLeft()
   Right2Forward();
 }
 
+/*
 void cmForward(int x)
 {
   // 188.5 mm  * (1 cm / 10 mm) * (500 count / 30 cm) = 314 count per 1 rotation or 16 count per 1 cm
@@ -242,76 +188,7 @@ void cmReverse(int x)
   interrupts();
   Reverse();
 }
-
-
-/*void loop() {  
-  // Below is the command input
-
-  Serial.println("Input your command: ");
-  if(Serial.available() > 0)
-  {
-    // Read Serial for input, and add into a char buffer
-    int inputLen = Serial.readBytesUntil(10, buffer, 10);
-    Serial.print("You have input command: ");
-
-    int number = atoi(buffer);
-    Serial.println(number);
-    Serial.println("");
-
-    // Depending on the input, execute the following instructions.
-    // '9' is a special sequence designed to test cmForward and cmReverse
-    if(number == 1)
-    {
-      Forward();
-    }
-
-    else if(number == 2)
-    {
-      Reverse();
-    }
-
-    else if(number == 3)
-    {
-      Brake();
-    }
-
-    else if(number == 4)
-    {
-      Coast();
-    }
-
-    else if(number == 5)
-    {
-      TurnLeft();
-    }
-
-    else if(number == 6)
-    {
-      TurnRight();
-    }
-
-    else if(number == 7)
-    {
-      PivotLeft();
-    }
-
-    else if(number == 8)
-    {
-      PivotRight();
-    }
-
-    // Test procedure cmForward and cmReverse
-    else if(number == 9)
-    {
-      cmForward(10);
-    }
-
-  }  
-  delay(2000);
-  
-  
-
-}
+*/
 
 
 /*
