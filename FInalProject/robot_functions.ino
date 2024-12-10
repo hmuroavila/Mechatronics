@@ -1,8 +1,8 @@
 bool readButton() {
-  if(onButtonPin = 1) {
-    onButton = TRUE;
+  if(onButtonPin == 1) {
+    onButton = true;
   } else {
-    onButton = FALSE;
+    onButton = false;
   }
   return onButton;
 }
@@ -51,4 +51,35 @@ float readDistance() { //uses equation to calculate distance, have 8 pieces for 
   }
 
   return distance;
+}
+
+/*
+setup
+#include "Wire.h"
+#include "Adafruit_TCS34725.h"
+
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+
+*/
+
+void readColor() {
+  float red, green, blue;
+  delay(60);  // takes 50ms to read
+  for(int i=0;i<5;i++) {
+    tcs.getRGB(&red, &green, &blue);
+    redReadings[i] = (int)red;
+    blueReadings[i] = (int)blue;
+    greenReadings[i] = (int)green;
+  }
+
+  redValueAvg = (redReadings[0] + redReadings[1] + redReadings[2] + redReadings[3] + redReadings[4])/5;
+  greenValueAvg = (greenReadings[0] + greenReadings[1] + greenReadings[2] + greenReadings[3] + greenReadings[4])/5;
+  blueValueAvg = (blueReadings[0] + blueReadings[1] + blueReadings[2] + blueReadings[3] + blueReadings[4])/5;
+
+  Serial.print("Red avg val =");
+  Serial.println(redValueAvg);
+  Serial.print("Green avg val =");
+  Serial.println(greenValueAvg);
+  Serial.print("Blue avg val =");
+  Serial.println(blueValueAvg);
 }

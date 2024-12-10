@@ -4,10 +4,12 @@
 // given how the previous state could possibly be in the opposite direction,
 // allowing the motor some time to reset before reversing polarity.
 
-
+/*
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+*/
+
 
 // Defining PINS
 // ENA, IN1 and IN2 are the 1st (LEFT) motor variables
@@ -39,16 +41,19 @@ char buffer[10];
 volatile int counter;
 int countToTravel;
 volatile bool countCheck;
-int speed;
+int speed
 
 void setup() {
   // Stop interrupts to briefly set up some variables
   // Part 2 portion
   // Stop interupts and 
+  
   noInterrupts();
   counter = 0;
   countCheck = false;
   interrupts();
+  
+  
   
   Serial.begin(9600);
   Serial.setTimeout(60000);
@@ -69,12 +74,8 @@ void setup() {
   pinMode(ROutA, INPUT_PULLUP);
   pinMode(ROutB, INPUT_PULLUP);
 
-  /*
-  pinMode(speed1, INPUT);
-  pinMode(speed2, INPUT);
-  pinMode(speed3, INPUT);
-  pinMode(speed4, INPUT);
-  */
+  
+  
 
   // Attaching interrupts to ONLY ONE wheel output
   // Part 2 section
@@ -85,6 +86,7 @@ void setup() {
 
   // Set everything else to LOW for now (aka COAST)
 }
+
 
 
 
@@ -303,10 +305,13 @@ void loop() {
 
   Serial.print("counter is at: ");
   Serial.println(counter);
+
+
+
 }
 
 
-
+/*
 // Interrupt services (Part 2)
 void interruptRising()
 {
@@ -316,7 +321,7 @@ void interruptRising()
 }
 
 
-/*
+
 void interruptFalling()
 {
   counter++;

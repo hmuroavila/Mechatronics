@@ -1,28 +1,50 @@
-#include <Servo.h>
+// Main program for the robot, this is where the state machine should be.
 
-#define distSnsr A0
+
+#include <Servo.h>
+#include "Wire.h"
+#include "Adafruit_TCS34725.h"
+
+#define distSnsr A8
 #define servoPin 12 // change pin number as needed
 
 #define initalServoPosition 180 // can change inital servo position between 0 and 180 (center at 90)
-#define wall1Dist 10 // in cm
-#define wall2Dist 10 // in cm
-#define wall3Dist 10 // in cm
-#define wall4Dist 10 // in cm
-#define quartersBackStage1 5 // in cm
-#define quartersBackStage2 10 // in cm
-#define distanceToQuarters 2 // in cm
-#define hitButtonDist 1 // in cm
+#define initialDist 43 // in cm
+#define coinDist 10 // in cm
+#define backdist 10 // in cm
+#define minChasis 10 // in cm
+#define backButton 56 // in cm
+#define greenAngle -90
+#define blueAngle -60
+#define whiteAngle -30
+#define redAngle 30
+#define purpleAngle 60
+#define yellowAngle 90
+#define servoDown 30
+#define ServoUp 60
 
+
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 Servo myServo;
 
-bool onButton = FALSE;
-bool lineStage1 = FALSE;
-bool lineStage2 = FALSE;
-bool lineStage3 = FALSE;
-bool lineStage4 = FALSE;
-bool quartersStage1 = FALSE;
-bool quartersStage2 = FALSE;
-bool hitButtonStage = FALSE;
+bool stage1 = false;
+bool stage2 = false;
+bool stage3 = false;
+bool stage4 = false;
+bool stage5 = false;
+bool stage6 = false;
+bool stage7 = false;
+bool stage8 = false;
+bool foundLine = false;
+float angleToTurn = 0;
+int angles [] = {-90, -60, -30, 30, 60, 90};
+int redReadings[5] = {0,0,0,0,0};
+int greenReadings[5] = {0,0,0,0,0};
+int blueReadings[5] = {0,0,0,0,0};
+int redValAvg;
+int greenValAvg;
+int blueValAvg;
+
 
 
 void setup() {
@@ -33,78 +55,123 @@ void setup() {
   pinMode(distSnsr, INPUT);
 
   myServo.attach(servoPin);
-  myServo.write(initialServoPosition);
+  myServo.write(initalServoPosition);
+  stage1=true;
 }
 
 void loop() {
   readButton();
+  readColor();
 
   while (readButton()) {
     Forward();
+    //initial forward go by 43cm vars needed. initdist stage1 stage2
+    if(stage1==true && stage2==false && stage3==false && stage4==false && stage5==false && stage6==false && stage7==false && stage8==false)
+    {
+      cmForward(initialDist);
+      stage1=false
+      stage2=true
+    }
+    //pivot right until sense line vards needed foundline stage2 stage3
+    if(stage1==false && stage2==true && stage3==false && stage4==false && stage5==false && stage6==false && stage7==false && stage8==false){
+      while(foundLine == false){
+        PivotRight();
+        if(/*linefollower found line*/){
+          foundLine=true;
+          stage2=false;
+          stage3=true
+        }
+      }
+    }
+    
 
-    if((readDistance() < wall1Dist) && (lineStage1 == FALSE) && (lineStage2 == FALSE) && (lineStage3 == FALSE) && (lineStage4 == FALSE) && (quartersStage1 == FALSE) && (quartersStage2 == FALSE) && (hitButtonStage == FALSE)) {
-      cmReverse(wall1Dist - readDistance()); // adjust to corner
-      pivotRight(); // pivot right
-      lineStage1 = TRUE;
+    //follow line until dist reads 10-20cm vars needed currentdist coindist stage3 stage4
+    if(stage1==false && stage2==false && stage3==true && stage4==false && stage5==false && stage6==false && stage7==false && stage8==false){
+        float currentDist=readDistance();
+        if(currendDist<=coinDist){
+          stage3=false;
+          stage4=true;
+        }
+        else{
+          //line follow forward
+        }
     }
 
-    if((readDistance() < wall2Dist) && (lineStage1 == TRUE) && (lineStage2 == FALSE) && (lineStage3 == FALSE) && (lineStage4 == FALSE) && (quartersStage1 == FALSE) && (quartersStage2 == FALSE) && (hitButtonStage == FALSE)) {
-      cmReverse(wall2Dist - readDistance()); // adjust to corner
-      pivotRight(); // pivot right
-      lineStage2 = TRUE;
+    //turn left 90 degrees vars needed backup stage4 stage5
+    if(stage1==false && stage2==false && stage3==false && stage4==true && stage5==false && stage6==false && stage7==false && stage8==false){
+        //turn left 90
+        stage4=false;
+        stage5=true;
     }
 
-    if((readDistance() < wall3Dist) && (lineStage1 == TRUE) && (lineStage2 == TRUE) && (lineStage3 == FALSE) && (lineStage4 == FALSE) && (quartersStage1 == FALSE) && (quartersStage2 == FALSE) && (hitButtonStage == FALSE)) {
-      cmReverse(wall3Dist - readDistance()); // adjust to corner
-      pivotRight(); // pivot right
-      lineStage3 = TRUE;
+    //go forward until distance reads min chassis dist to make sure pushed button vars needed minchasis stage5 stage6
+      if(stage1==false && stage2==false && stage3==false && stage4==false && stage5==true && stage6==false && stage7==false && stage8==false){
+          float currentDist=readDistance();
+          if(currentDist <= minChasis){
+            Forward();
+          }
+          else{
+            stage5=false;
+            stage6=true;
+          }
+      }
+
+    //go back 59 cm vars needed whackprepdist stage6 stage7
+    if(stage1==false && stage2==false && stage3==false && stage4==false && stage5==false && stage6==true && stage7==false && stage8==false){
+        cmReverse(backButton);
+        stage6=false;
+        stage7=true
     }
 
-    if((readDistance() < wall4Dist) && (lineStage1 == TRUE) && (lineStage2 == TRUE) && (lineStage3 == TRUE) && (lineStage4 == FALSE) && (quartersStage1 == FALSE) && (quartersStage2 == FALSE) && (hitButtonStage == FALSE)) {
-      cmReverse(wall4Dist - readDistance()); // adjust to corner
-      pivotRight(); // pivot right
-      lineStage4 = TRUE;
+    //loop for whack
+    // based on color input
+    // turn a certain amount of degrees
+    // go forward after internal hall effect reads a min dist add in line follow
+    //once dist sens reads min chasis dist stop
+    //depress servo
+    //retract servo
+    //read color until good match
+    //reverse dist until back in center 
+    //reset angle
+    //loop back with new color
+    if(stage1==false && stage2==false && stage3==false && stage4==false && stage5==false && stage6==false && stage7==true ){
+      int color = //read color func
+      int angleToTurn = angles[color];
+      int reverse = angleToTurn * -1;
+      //turn to angle
+      float currentDist= readDistance()
+      while(currentDist> minChasis){
+        //forwardLine
+      }
+      myServo.write(servoDown);
+      delay(1000);
+      myServo.write(servoUp);
+      bool foundColor = false;
+      while(!foundColor){
+        //readColor1
+        //delay 50
+        //readColor2
+        //delay 50
+        //readColor3
+        //delay 50
+        //readColor4
+        //delay 50
+        //readColor5
+        //delay 50
+        //if (readColor1==readColor2==readColor3==readColor4==readColor5){
+          // foundColor=true
+          // color = whatever was found
+       // }
+        
+      }
+      cmReverse(backButton);
+      //turn to angle reverse
+
+
     }
 
-    if((readDistance() < quartersBackStage1) && (lineStage1 == TRUE) && (lineStage2 == TRUE) && (lineStage3 == TRUE) && (lineStage4 == TRUE) && (quartersStage1 == FALSE) && (quartersStage2 == FALSE) && (hitButtonStage == FALSE)) {
-      cmReverse(quartersBackStage1 - readDistance()); // adjust to corner
-      pivotLeft(); // pivot right
-      cmReverse(distanceToQuarters);
-      cmForward(distanceToQuarters);
-      pivotRight()
-      quartersStage1 = TRUE;
-    }
 
-    if((readDistance() < quartersBackStage2) && (lineStage1 == TRUE) && (lineStage2 == TRUE) && (lineStage3 == TRUE) && (lineStage4 == TRUE) && (quartersStage1 == TRUE) && (quartersStage2 == FALSE) && (hitButtonStage == FALSE)) {
-      cmReverse(quartersBackStage2 - readDistance()); // adjust to corner
-      pivotLeft(); // pivot right
-      cmReverse(distanceToQuarters);
-      cmForward(distanceToQuarters);
-      pivotRight()
-      cmForward(wall4Dist - readDistance());
-      quartersStage1 = TRUE;
-    }
-
-    if((readDistance() < quartersBackStage2) && (lineStage1 == TRUE) && (lineStage2 == TRUE) && (lineStage3 == TRUE) && (lineStage4 == TRUE) && (quartersStage1 == TRUE) && (quartersStage2 == FALSE) && (hitButtonStage == FALSE)) {
-      cmReverse(quartersBackStage2 - readDistance()); // adjust to corner
-      pivotLeft(); // pivot right
-      cmReverse(distanceToQuarters);
-      cmForward(distanceToQuarters);
-      pivotRight()
-      cmForward(wall4Dist - readDistance());
-      pivotLeft();
-      quartersStage1 = TRUE;
-    }
-
-    if((readDistance() < hitButtonDist) && (lineStage1 == TRUE) && (lineStage2 == TRUE) && (lineStage3 == TRUE) && (lineStage4 == TRUE) && (quartersStage1 == TRUE) && (quartersStage2 == FALSE) && (hitButtonStage == FALSE)) {
-      int buttonTravelDist = hitButtonDist - readDistance();
-      cmForward(buttonTravelDist);
-      cmReverse(buttonTravelDist);
-      hitButtonStage = TRUE;
-    }
-
-    if((lineStage1 == TRUE) && (lineStage2 == TRUE) && (lineStage3 == TRUE) && (lineStage4 == TRUE) && (quartersStage1 == TRUE) && (quartersStage2 == FALSE) && (hitButtonStage == TRUE)) {
-      playGame();
-    }
+   
   }
 }
+

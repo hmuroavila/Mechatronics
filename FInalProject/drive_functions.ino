@@ -337,7 +337,7 @@ void loop() {
 
 
 
-/*
+
 // Interrupt services (Part 2)
 void interruptRising()
 {
@@ -397,4 +397,3 @@ void interruptFalling()
     reverseCheckCount = false;
   }
 }
-*/
