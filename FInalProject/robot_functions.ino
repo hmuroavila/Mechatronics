@@ -1,16 +1,56 @@
-bool readButton() {
-  if(onButtonPin == 1) {
-    onButton = true;
-  } else {
-    onButton = false;
+#include <Wire.h>
+#include <Adafruit_TCS34725.h>
+#include <Adafruit_I2CDevice.h>
+
+extern int onButtonPin;
+extern int distSnsr;
+extern bool robotOn;
+
+int redReadings[5] = {0,0,0,0,0};
+int greenReadings[5] = {0,0,0,0,0};
+int blueReadings[5] = {0,0,0,0,0};
+int redValueAvg = 0;
+int greenValueAvg = 0;
+int blueValueAvg = 0;
+
+int greenMole = 1; //leftmost mole
+int blueMole = 2;
+int whiteMole = 3;
+int redMole = 4;
+int purpleMole = 5;
+int yellowMole = 6; //rightmost mole
+
+
+/*
+int fiveCm = 630;
+int tenCm = 500;
+int fifteenCm = 360;
+int twentyCm = 
+int twentyfiveCm = 
+int thirtyCm = 
+int thirtyfiveCm = 
+int fortyCm = 
+int fortyfiveCm = 
+*/
+
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+
+void readButton() {
+  int buttonState;
+  buttonState = digitalRead(onButtonPin);
+  
+  if(buttonState == 1) {
+    robotOn = true;
   }
-  return onButton;
 }
 
 float readDistance() { //uses equation to calculate distance, have 8 pieces for piecewise
   int distance = 0;
-  int distSnsrVal = analogRead(distSnsr);
-  float out = distSnsr * (5.0 / 1023.0);
+  int distSnsrVal;
+  float out;
+
+  out = distSnsr * (5.0 / 1023.0);
+  distSnsrVal = analogRead(distSnsr);
   
   //between 40 and anything
   if(out>0&&out<.91){
@@ -50,7 +90,7 @@ float readDistance() { //uses equation to calculate distance, have 8 pieces for 
     distance = -2.56*out + 12.8;
   }
 
-  return distance;
+  return distSnsrVal;
 }
 
 /*
@@ -65,6 +105,7 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS3472
 void readColor() {
   float red, green, blue;
   delay(60);  // takes 50ms to read
+
   for(int i=0;i<5;i++) {
     tcs.getRGB(&red, &green, &blue);
     redReadings[i] = (int)red;
@@ -76,10 +117,35 @@ void readColor() {
   greenValueAvg = (greenReadings[0] + greenReadings[1] + greenReadings[2] + greenReadings[3] + greenReadings[4])/5;
   blueValueAvg = (blueReadings[0] + blueReadings[1] + blueReadings[2] + blueReadings[3] + blueReadings[4])/5;
 
-  Serial.print("Red avg val =");
+  Serial.print("Red avg val = ");
   Serial.println(redValueAvg);
-  Serial.print("Green avg val =");
+  Serial.print("Green avg val = ");
   Serial.println(greenValueAvg);
-  Serial.print("Blue avg val =");
+  Serial.print("Blue avg val = ");
   Serial.println(blueValueAvg);
+  Serial.println("");
+}
+
+int identifyColor() {
+  if(redValueAvg > greenValueAvg) {
+    if(greenValueAvg > blueValueAvg) {
+      if(redValueAvg > 100) {
+        if((redValueAvg-greenValueAvg) > 90) {
+          return redMole;
+        } else {
+          return yellowMole;
+        }
+      } else {
+        return whiteMole;
+      }
+    } else {
+      return purpleMole;
+    }
+  } else {
+    if(greenValueAvg > blueValueAvg) {
+      return greenMole;
+    } else {
+      return blueMole;
+    }
+  }
 }
