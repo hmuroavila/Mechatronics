@@ -4,11 +4,11 @@
 // given how the previous state could possibly be in the opposite direction,
 // allowing the motor some time to reset before reversing polarity.
 
-/*
+
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
-*/
+
 
 
 // Defining PINS
@@ -41,7 +41,7 @@ char buffer[10];
 volatile int counter;
 int countToTravel;
 volatile bool countCheck;
-int speed
+int speed;
 
 void setup() {
   // Stop interrupts to briefly set up some variables
@@ -311,7 +311,7 @@ void loop() {
 }
 
 
-/*
+
 // Interrupt services (Part 2)
 void interruptRising()
 {
@@ -321,7 +321,7 @@ void interruptRising()
 }
 
 
-
+/*
 void interruptFalling()
 {
   counter++;
