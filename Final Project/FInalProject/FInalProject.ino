@@ -1,4 +1,4 @@
-
+/*
 
 
 void setup() {
@@ -12,7 +12,7 @@ void loop() {
 }
 
 
-
+*/
 /*
 We are going to need a state machine, most likley using enum to define our actual states
 Then using switch case in order to be switching between our states
