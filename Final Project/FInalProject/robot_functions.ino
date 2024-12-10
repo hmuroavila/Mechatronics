@@ -1,3 +1,7 @@
+int redReadings[5];
+int greenReadings[5];
+int blueReadings[5];
+
 bool readButton() {
   if(onButtonPin == 1) {
     onButton = true;
@@ -51,4 +55,24 @@ float readDistance() { //uses equation to calculate distance, have 8 pieces for 
   }
 
   return distance;
+}
+
+/*
+setup
+#include "Wire.h"
+#include "Adafruit_TCS34725.h"
+
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+
+*/
+
+void readColor() {
+  float red, green, blue;
+  delay(60);  // takes 50ms to read
+  for(int i=0;i<5;i++) {
+    tcs.getRGB(&red, &green, &blue);
+    redReadings[i] = (int)red;
+    blueReadings[i] = (int)blue;
+    greenReadings[i] = (int)green;
+  }
 }
