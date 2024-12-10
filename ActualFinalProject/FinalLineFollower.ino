@@ -1,30 +1,5 @@
-#include <QTRSensors.h>
-#include <math.h>
-#include <string.h>
-#include <stdio.h>
-
-
-int LeftSpeed;
-int RightSpeed;
-
-// Define your sensor object
-QTRSensors qtr;
-const uint8_t sensorCount = 8;
-uint16_t sensorValues[sensorCount];
-
-// PID constants
-float Kp = 0.1; // Proportional gain
-float Ki = 0.0; // Integral gain
-float Kd = 0.0; // Derivative gain
-
-// PID variables
-float error = 0, lastError = 0, integral = 0;
-float setPoint = 3500; // Desired position (middle value for 8 sensors)
-
 // Setup your pins and sensor
-void setup() {
-  Serial.begin(9600);
-  MovementSetup();
+void lineSetup() {
   
   // Initialize the QTR sensors
   qtr.setTypeRC();
@@ -46,7 +21,7 @@ void setup() {
 }
 
 // Main loop
-void loop() {
+void followLine() {
   uint16_t position = qtr.readLineBlack(sensorValues);
   int baseSpeed = 100;
   error = setPoint - position;

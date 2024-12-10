@@ -16,13 +16,13 @@
 // ENB, IN3 and IN4 are the 2nd (RIGHT) motor variables
 #define ENA 31
 #define ENB 33
-#define IN1 2
+#define IN1 4
 #define IN2 25
 #define IN3 27
 #define IN4 3
 
 // Digital INPUT pins for measuring distance
-#define LOutA 22
+#define LOutA 2
 #define LOutB 24
 #define ROutA 26
 #define ROutB 28
@@ -80,7 +80,7 @@ void setup() {
   // Attaching interrupts to ONLY ONE wheel output
   // Part 2 section
 
-  speed = 100;
+  speed = 1;
   attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
   Forward();
 
@@ -318,6 +318,12 @@ void interruptRising()
   // Whenever a rising edge from LEFT motor is detected on OutputA, we call this function
   // It will add to the appropriateCOUNT
   counter++;
+  // 855 is the magic number
+  if(counter >= 855)
+  {
+    Brake();
+    detachInterrupt(digitalPinToInterrupt(LOutA));
+  }
 }
 
 

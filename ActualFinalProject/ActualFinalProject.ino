@@ -1,8 +1,39 @@
+// Global variables and shit
+#include <QTRSensors.h>
+#include <math.h>
+#include <string.h>
+#include <stdio.h>
+
+#define LOutA 2
+
+
+
+int LeftSpeed;
+int RightSpeed;
+
+// Define your sensor object
+QTRSensors qtr;
+const uint8_t sensorCount = 8;
+uint16_t sensorValues[sensorCount];
+
+// PID constants
+float Kp = 0.1; // Proportional gain
+float Ki = 0.0; // Integral gain
+float Kd = 0.0; // Derivative gain
+
+// PID variables
+float error = 0, lastError = 0, integral = 0;
+float setPoint = 3500; // Desired position (middle value for 8 sensors)
+
+// Interrupt things
+volatile int counter;
+int targetCount;
+
 // State machine stuff is going in here.
 #define buttonPin 53
 
 // Start definding states
-enum State{,
+enum State{
   startingState,
   calibrate,
   initialForward,
@@ -17,22 +48,26 @@ enum State{,
   toRed,
   toPurple,
   toYellow
-}
+};
+
+State currentState;
+
 
 void setup() {
-  /*
   // Button stuff
   pinMode(buttonPin, INPUT_PULLUP);
   currentState = startingState;
 
   // Interrupt stuff
   noInterrupts();
-  */
+
+  // other script setup
+  MovementSetup();
+  lineSetup();
 
 }
 
 void loop() {
-    /*
 
   switch (currentState){
     case startingState:
@@ -50,6 +85,7 @@ void loop() {
       for (int i = 0; i < 200; i++) {
         qtr.calibrate();
       }
+      currentState = initialForward;
 
       break;
     
@@ -57,10 +93,11 @@ void loop() {
       // In this step, we are moving a certain amount to try to reach outsie the box, switching turn right
       cmForward(25);
       TurnRight();
-      while((qtr.readLineBlack == 7000) || (qtr.readLineBlack == 0))
+      while((qtr.readLineBlack(sensorValues) == 7000) || (qtr.readLineBlack(sensorValues) == 0))
       {
         delay(10);
       }
+      Coast();
       currentState = followLine1;
       break;
 
@@ -68,17 +105,26 @@ void loop() {
     case followLine1:
       //Theoreticaly can implement a measure distance here
       // Fix this attach interrupt here on the bottom
-      attachInterrupt();
-      while(measureDistanceTraveled() < 50)
+      attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
+      while((counter / 45) <= 50)
       {
         followLine();
       }
-      detachInterrupt();
-      currentState = followLine
+      detachInterrupt(digitalPinToInterrupt(LOutA));   
+      counter = 0;
+
+      currentState = followLine2;
       break;
 
     case followLine2:
-      while(measureDistance() > 10)
+    /*
+      while(measureDistance() >= 10){
+        followLine();
+      }
+      */
+      pivotLeftDegree();
+
+      currentState = toInfinity;
       break;
 
     case toInfinity:
@@ -107,48 +153,6 @@ void loop() {
     case toYellow:
       break;
   }
-  */
 
-  
 }
 
-
-
-/*
-We are going to need a state machine, most likley using enum to define our actual states
-Then using switch case in order to be switching between our states
-
-We currently have 3 goals (that I know of)
-Follow the line
-By following the line, we should be able to kock down the coins
-Once we detect we are getting near the wall, we need to go to the other black line
-Hit the button
-Then after that we continue with a loop where we:
-  Detect tbe colo of the lights
-  MOve to the relevant wack a mole and hit it
-  Repeat
-
-  Currently the devices that we need are:
-  Arduino
-  5V and 9V battery back
-  The dual H brudge
-  Two motors and their revelant feedback sensors
-  The IR/distance sensor (needs to be retested)
-  The color sensor, need to make sure it works
-  The servo
-  I believe that is all
-
-
-  The states should therfore be
-  1 = The initial state: Do nothing until we get a button (transistion state)
-  2 = Button press -> black and white calibration, we can just use the built in functions from the QTR library ()
-  3 = The move foward state: Becuase of the dimenension, move forwad (transision action is based on time) 
-  // This will have to be distance time or just clear the line (TIME could work well to not deal with interrupts )
- 4 = The line follower: Once we find the line following the line until the the distance sensor finds out that we are past a certain amount of time (transition)
- 5 = Line follower 2.0: Once we are clear of the first wall, continue liune follwing until we reach the actual final wall.
-
- 6 = Hard coded movement: Move backwards a bit, turn 
-  
-  We can include other bits and pieces to make it work more naturally, for example a button as a beginning state with a red/green LED would be cool
-
-*/

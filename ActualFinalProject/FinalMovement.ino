@@ -3,16 +3,16 @@
 // ENB, IN3 and IN4 are the 2nd (RIGHT) motor variables
 #define ENA 31
 #define ENB 33
-#define IN1 2
+#define IN1 4
 #define IN2 25
 #define IN3 27
 #define IN4 3
 
 // Digital INPUT pins for measuring distance
-#define LOutA 22
 #define LOutB 24
 #define ROutA 26
 #define ROutB 28
+
 
 // New speed values for Line following in other folder
 
@@ -31,6 +31,8 @@ void MovementSetup() {
   pinMode(LOutB, INPUT_PULLUP);
   pinMode(ROutA, INPUT_PULLUP);
   pinMode(ROutB, INPUT_PULLUP);
+
+  counter = 0;
 
   // Set everything else to LOW for now (aka COAST)
   Coast(); 
@@ -174,62 +176,46 @@ void PivotLeft()
   Right2Forward();
 }
 
-
-/*
 void cmForward(int x)
 {
-  // 188.5 mm  * (1 cm / 10 mm) * (500 count / 30 cm) = 314 count per 1 rotation or 16 count per 1 cm
-  // reset count
-  noInterrupts();
-  counter = 0;
-  countCheck = true;
-  countToTravel = (int)( (float)x * 16.0);
-  interrupts();
+  attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
+  targetCount = x * 45;
   Forward();
 }
  
 void cmReverse(int x)
 {
-  noInterrupts();
-  counter = 0;
-  countCheck = true;
-  countToTravel = (int)( (float)x * 16.0);
-  interrupts();
+  attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
+  targetCount = x * 45;
   Reverse();
 }
 
-*/
-/*
-// Interrupt services (Part 2)
+
+// It will turn a certain number of inchies, calulate the thing off of that thing
+void pivotLeftDegree()
+{
+  attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
+  targetCount = 45;
+  PivotLeft();
+}
+
+void pivotRightDegree()
+{
+  attachInterrupt(digitalPinToInterrupt(LOutA), interruptRising, RISING);
+  targetCount = 45;
+  PivotRight();
+}
+
+
 void interruptRising()
 {
-  // Whenever a rising edge from LEFT motor is detected on OutputA, we call this function
-  // It will add to the appropriateCOUNT
   counter++;
-
-  if((countCheck == true) && (counter >= countToTravel))
-  {
+  if(counter >= targetCount){
     Brake();
-    countCheck = false;
+    detachInterrupt(digitalPinToInterrupt(LOutA));
+    counter = 0;
   }
 }
-
-
-
-void interruptFalling()
-{
-  counter++;
-
-  if((countCheck == true) && (counter >= countToTravel))
-  {
-    Brake();
-    countCheck = false;
-
-  }
-
-}
-
-*/
 
 
 
