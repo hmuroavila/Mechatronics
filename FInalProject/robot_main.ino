@@ -2,10 +2,8 @@
 
 
 #include <Servo.h>
-#include "Wire.h"
-#include "Adafruit_TCS34725.h"
 
-#define distSnsr A8
+#define onButtonPin 14
 #define servoPin 12 // change pin number as needed
 
 #define initalServoPosition 180 // can change inital servo position between 0 and 180 (center at 90)
@@ -23,10 +21,12 @@
 #define servoDown 30
 #define ServoUp 60
 
+extern void readColor();
+extern float readDistance();
 
-Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 Servo myServo;
 
+bool robotOn = false;
 bool stage1 = false;
 bool stage2 = false;
 bool stage3 = false;
@@ -38,21 +38,16 @@ bool stage8 = false;
 bool foundLine = false;
 float angleToTurn = 0;
 int angles [] = {-90, -60, -30, 30, 60, 90};
-int redReadings[5] = {0,0,0,0,0};
-int greenReadings[5] = {0,0,0,0,0};
-int blueReadings[5] = {0,0,0,0,0};
-int redValAvg;
-int greenValAvg;
-int blueValAvg;
-
+int distSnsr = A8;
 
 
 void setup() {
-  Serial.println(9600);
+  Serial.begin(9600);
 
   driveSetup();
 
   pinMode(distSnsr, INPUT);
+  pinMode(onButtonPin,INPUT_PULLUP);
 
   myServo.attach(servoPin);
   myServo.write(initalServoPosition);
@@ -60,26 +55,32 @@ void setup() {
 }
 
 void loop() {
-  readButton();
   readColor();
+  Serial.println(identifyColor());
+  //Serial.println(readDistance());
 
-  while (readButton()) {
+  /*
+  readButton();
+  
+
+  while (robotOn) {
     Forward();
     //initial forward go by 43cm vars needed. initdist stage1 stage2
     if(stage1==true && stage2==false && stage3==false && stage4==false && stage5==false && stage6==false && stage7==false && stage8==false)
     {
       cmForward(initialDist);
-      stage1=false
-      stage2=true
+      stage1=false;
+      stage2=true;
     }
     //pivot right until sense line vards needed foundline stage2 stage3
     if(stage1==false && stage2==true && stage3==false && stage4==false && stage5==false && stage6==false && stage7==false && stage8==false){
       while(foundLine == false){
         PivotRight();
-        if(/*linefollower found line*/){
+        if(//linefollower found line
+        ){
           foundLine=true;
           stage2=false;
-          stage3=true
+          stage3=true;
         }
       }
     }
@@ -120,7 +121,7 @@ void loop() {
     if(stage1==false && stage2==false && stage3==false && stage4==false && stage5==false && stage6==true && stage7==false && stage8==false){
         cmReverse(backButton);
         stage6=false;
-        stage7=true
+        stage7=true;
     }
 
     //loop for whack
@@ -166,12 +167,8 @@ void loop() {
       }
       cmReverse(backButton);
       //turn to angle reverse
-
-
     }
-
-
-   
   }
+  */
 }
 
